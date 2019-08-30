@@ -121,7 +121,9 @@ RCT_EXPORT_METHOD(pdf_to_img:(NSString *)fromPDFName
     [fileManager createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:&error];
     
     int i = 1;
-    
+    NSMutableArray *imageArr = [NSMutableArray array];
+    CGSize imageSize = CGSizeZero;
+    //    UIGraphicsBeginImageContext(CGSizeMake(imageSize.width, imageSize.height * images.count));
     for (i = 1; i <= pages; i++) {
         CGPDFPageRef pageRef = CGPDFDocumentGetPage(fromPDFDoc, i);
         
@@ -129,6 +131,7 @@ RCT_EXPORT_METHOD(pdf_to_img:(NSString *)fromPDFName
         // determine the size of the PDF page
         CGRect pageRect = CGPDFPageGetBoxRect(pageRef, kCGPDFMediaBox);
         // renders its content.
+        imageSize = pageRect.size;
         
         UIGraphicsBeginImageContext(pageRect.size);
         
@@ -153,27 +156,37 @@ RCT_EXPORT_METHOD(pdf_to_img:(NSString *)fromPDFName
         
         UIImage *tempImage = UIGraphicsGetImageFromCurrentImageContext();
         
+        [imageArr addObject:tempImage];
+        
         UIGraphicsEndImageContext();
         
         //Release current source page
         
         CGPDFPageRelease(pageRef);
         // Store IMG
-        
-        NSString *imgname = [NSString stringWithFormat:@"fromPDFName.png", i];
-        
-        imgPath = [folderPath stringByAppendingPathComponent:imgname];
-        [UIImagePNGRepresentation(tempImage) writeToFile:imgPath atomically:YES];
+        //
+        //        NSString *imgname = [NSString stringWithFormat:@"fromPDFName_%d.png", i];
+        //
+        //        imgPath = [folderPath stringByAppendingPathComponent:imgname];
+        //        [UIImagePNGRepresentation(tempImage) writeToFile:imgPath atomically:YES];
+        //
+        //         UIImageWriteToSavedPhotosAlbum(tempImage, self, nil, nil);
     }
+    /** add by Stephen at2019-08-30 start*/
+    // 合并多张图片为一张长图
+    UIImage *newImg = [self mergeImages:imageArr imageSize:imageSize];
+    
+    NSString *imgname = [NSString stringWithFormat:@"fromPDFName.png"];
+    imgPath = [folderPath stringByAppendingPathComponent:imgname];
+    [UIImagePNGRepresentation(newImg) writeToFile:imgPath atomically:YES];
+    /** add by Stephen at2019-08-30 end*/
+    
     CGPDFDocumentRelease(fromPDFDoc);
-    
-    
     NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
                           imgPath, @"filePath", nil];
     resolve(data);
 }
 /**add by david  pdf 转图片格式 end  */
-
 
 RCT_EXPORT_METHOD(convert:(NSDictionary *)options
                   resolver:(RCTPromiseResolveBlock)resolve
@@ -278,7 +291,7 @@ RCT_EXPORT_METHOD(convert:(NSDictionary *)options
 - (void)webViewDidFinishLoad:(UIWebView *)awebView
 {
     if (awebView.isLoading)
-        return;
+    return;
     
     UIPrintPageRenderer *render = [[UIPrintPageRenderer alloc] init];
     [render addPrintFormatter:awebView.viewPrintFormatter startingAtPageAtIndex:0];
@@ -311,6 +324,86 @@ RCT_EXPORT_METHOD(convert:(NSDictionary *)options
         _rejectBlock(RCTErrorUnspecified, nil, RCTErrorWithMessage(error.description));
     }
 }
+
+/**add by Stephen at 2019-08-30 start */
+// 合并图片
+-(UIImage *)mergeImages:(NSMutableArray *)images imageSize:(CGSize)imageSize {
+    UIImage *originImg = [UIImage new];
+    CGFloat imageWidth = imageSize.width;
+    CGFloat imageHeight = imageSize.height * images.count;
+    [originImg drawInRect:CGRectMake(0, 0, imageWidth, imageHeight)];
+    // [UIScreen mainScreen].scale 可以让图片不失真
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(imageWidth, imageHeight), NO, [UIScreen mainScreen].scale);
+    for (int i = 0; i < images.count; i++) {
+        UIImage *img = images[i];
+        [img drawInRect:CGRectMake(0, imageSize.height * i, imageWidth, imageSize.height)];
+    }
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    // 压缩图片
+    NSData *imgData = [self zipImage:newImage toByte:5 * 1024.0 * 1024.0];
+    UIImage *newImg = [UIImage imageWithData:imgData];
+    
+    return newImg;
+    
+}
+
+//先尺寸压缩, 在质量压缩
+-(NSData *)zipImage:(UIImage *)sourceImage toByte:(NSUInteger)maxLength{
+    //进行图像尺寸的压缩
+    CGSize imageSize = sourceImage.size;//取出要压缩的image尺寸
+    CGFloat width = imageSize.width;    //图片宽度
+    CGFloat height = imageSize.height;  //图片高度
+    //1.宽高大于1280(宽高比不按照2来算，按照1来算)
+    if (width>1280||height>1280) {
+        if (width>height) {
+            CGFloat scale = height/width;
+            width = 1280;
+            height = width*scale;
+        }else{
+            CGFloat scale = width/height;
+            height = 1280;
+            width = height*scale;
+        }
+        //2.宽大于1280高小于1280
+    }else if(width>1280||height<1280){
+        CGFloat scale = height/width;
+        width = 1280;
+        height = width*scale;
+        //3.宽小于1280高大于1280
+    }else if(width<1280||height>1280){
+        CGFloat scale = width/height;
+        height = 1280;
+        width = height*scale;
+        //4.宽高都小于1280
+    }else{
+    }
+    UIGraphicsBeginImageContext(CGSizeMake(width, height));
+    [sourceImage drawInRect:CGRectMake(0,0,width,height)];
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    //进行图像的画面质量压缩
+    CGFloat compression = 1;
+    NSData *data = UIImageJPEGRepresentation(newImage, compression);
+    if (data.length < maxLength) return data;
+    CGFloat max = 1;
+    CGFloat min = 0;
+    for (int i = 0; i < 6; ++i) {
+        compression = (max + min) / 2;
+        data = UIImageJPEGRepresentation(sourceImage, compression);
+        if (data.length < maxLength * 0.9) {
+            min = compression;
+        } else if (data.length > maxLength) {
+            max = compression;
+        } else {
+            break;
+        }
+    }
+    return data;
+}
+/**add by Stephen at 2019-08-30 end */
 
 @end
 
