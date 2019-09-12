@@ -6,8 +6,9 @@ import android.graphics.Bitmap;
 import android.os.Environment;
 import android.print.PdfConverter;
 import android.print.PrintAttributes;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.PermissionChecker;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.PermissionChecker;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
