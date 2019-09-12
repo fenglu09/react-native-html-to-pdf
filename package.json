@@ -49,5 +49,5 @@
   "scripts": {
     "start": "node_modules/react-native/packager/packager.sh"
   },
-  "version": "0.8.0"
+  "version": "1.1"
 }
