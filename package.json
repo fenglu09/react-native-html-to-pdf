@@ -1,53 +1,25 @@
 {
-  "_from": "react-native-html-to-pdf",
-  "_id": "react-native-html-to-pdf@0.8.0",
-  "_inBundle": false,
-  "_integrity": "sha1-xuJylqBd52rDgAQGFE69/XfP4FQ=",
-  "_location": "/react-native-html-to-pdf",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "react-native-html-to-pdf",
-    "name": "react-native-html-to-pdf",
-    "escapedName": "react-native-html-to-pdf",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
+  "name": "react-native-html-to-pdf",
+  "version": "1.1.1",
+  "description": "react-native-html-to-pdf",
+  "main": "index.js",
+  "scripts": {`
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
   },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npm.taobao.org/react-native-html-to-pdf/download/react-native-html-to-pdf-0.8.0.tgz",
-  "_shasum": "c6e27296a05de76ac3800406144ebdfd77cfe054",
-  "_spec": "react-native-html-to-pdf",
-  "_where": "/Users/guozhan/Desktop/ms_2",
-  "author": {
-    "name": "Christopher Dro",
-    "email": "casheghian@gmail.com",
-    "url": "http://chris.si"
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:fenglu09/react-native-html-to-pdf.git"
   },
-  "bugs": {
-    "url": "https://github.com/christopherdro/react-native-html-to-pdf/issues"
-  },
-  "bundleDependencies": false,
-  "deprecated": false,
-  "description": "Convert html strings to PDF documents using React Native",
-  "homepage": "https://github.com/christopherdro/react-native-html-to-pdf",
   "keywords": [
     "html",
     "pdf",
     "react-native"
   ],
+  "author": "Jason <fenglu09@gmail.com> (https://github.com/fenglu09)",
   "license": "MIT",
-  "name": "react-native-html-to-pdf",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/christopherdro/react-native-html-to-pdf.git"
+  "bugs": {
+    "url": "https://github.com/fenglu09/react-native-html-to-pdf/issues"
   },
-  "scripts": {
-    "start": "node_modules/react-native/packager/packager.sh"
-  },
-  "version": "1.1"
+  "homepage": "https://github.com/fenglu09/react-native-html-to-pdf"
 }
