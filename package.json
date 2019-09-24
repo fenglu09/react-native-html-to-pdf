@@ -29,12 +29,12 @@
     "url": "http://chris.si"
   },
   "bugs": {
-    "url": "https://github.com/christopherdro/react-native-html-to-pdf/issues"
+    "url": "https://github.com/fenglu09/react-native-html-to-pdf/issues"
   },
   "bundleDependencies": false,
   "deprecated": false,
   "description": "Convert html strings to PDF documents using React Native",
-  "homepage": "https://github.com/christopherdro/react-native-html-to-pdf",
+  "homepage": "https://github.com/fenglu09/react-native-html-to-pdf",
   "keywords": [
     "html",
     "pdf",
@@ -44,7 +44,7 @@
   "name": "react-native-html-to-pdf",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/christopherdro/react-native-html-to-pdf.git"
+    "url": "git+https://github.com/fenglu09/react-native-html-to-pdf.git"
   },
   "scripts": {
     "start": "node_modules/react-native/packager/packager.sh"
