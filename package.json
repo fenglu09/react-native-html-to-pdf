@@ -1,16 +1,13 @@
 {
   "name": "react-native-html-to-pdf",
   "version": "1.1.1",
-  "description": "react-native-html-to-pdf",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint ."
+  "description": "Convert html strings to PDF documents using React Native",
+  "bugs": {
+    "url": "https://github.com/fenglu09/react-native-html-to-pdf/issues"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:fenglu09/react-native-html-to-pdf.git"
-  },
+  "bundleDependencies": false,
+  "deprecated": false,
   "keywords": [
     "html",
     "pdf",
@@ -18,8 +15,12 @@
   ],
   "author": "Jason <fenglu09@gmail.com> (https://github.com/fenglu09)",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/fenglu09/react-native-html-to-pdf/issues"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fenglu09/react-native-html-to-pdf.git"
+  },
+  "scripts": {
+    "start": "node_modules/react-native/packager/packager.sh"
   },
   "homepage": "https://github.com/fenglu09/react-native-html-to-pdf"
 }
