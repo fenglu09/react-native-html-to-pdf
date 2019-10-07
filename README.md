@@ -1,5 +1,5 @@
 # react-native-html-to-pdf
-
+根据`https://github.com/christopherdro/react-native-html-to-pdf`修改
 Convert html strings to PDF documents using React Native
 
 ## Installation

@@ -19,39 +19,84 @@ import java.util.ArrayList;
 
 public class Utils {
 
+//    public static ArrayList<Bitmap> pdfToBitmap(File pdfFile, Context context) {
+//        ArrayList<Bitmap> bitmaps = new ArrayList<>();
+//        try {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                PdfRenderer renderer = new PdfRenderer(ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY));
+//                Bitmap bitmap;
+//                final int pageCount = renderer.getPageCount();
+//                Log.e("test_sign", "图片de 张数： " + pageCount);
+//                for (int i = 0; i < pageCount; i++) {
+//                    PdfRenderer.Page page = renderer.openPage(i);
+//                    int width = context.getResources().getDisplayMetrics().densityDpi / 72 * page.getWidth();
+//                    int height = context.getResources().getDisplayMetrics().densityDpi / 72 * page.getHeight();
+//                    bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//                    //todo 以下三行处理图片存储到本地出现黑屏的问题，这个涉及到背景问题
+//                    Canvas canvas = new Canvas(bitmap);
+//                    canvas.drawColor(Color.WHITE);
+//                    canvas.drawBitmap(bitmap, 0, 0, null);
+//                    Rect r = new Rect(0, 0, width, height);
+//                    page.render(bitmap, r, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+//                    bitmaps.add(bitmap);
+//                    // close the page
+//                    page.close();
+//                }
+//                // close the renderer
+//                renderer.close();
+//            }
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//
+//        return bitmaps;
+//
+//    }
+
     public static ArrayList<Bitmap> pdfToBitmap(File pdfFile, Context context) {
         ArrayList<Bitmap> bitmaps = new ArrayList<>();
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 PdfRenderer renderer = new PdfRenderer(ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY));
-                Bitmap bitmap;
-                final int pageCount = renderer.getPageCount();
-                Log.e("test_sign", "图片de 张数： " + pageCount);
-                for (int i = 0; i < pageCount; i++) {
-                    PdfRenderer.Page page = renderer.openPage(i);
-                    int width = context.getResources().getDisplayMetrics().densityDpi / 72 * page.getWidth();
-                    int height = context.getResources().getDisplayMetrics().densityDpi / 72 * page.getHeight();
-                    bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-                    //todo 以下三行处理图片存储到本地出现黑屏的问题，这个涉及到背景问题
-                    Canvas canvas = new Canvas(bitmap);
-                    canvas.drawColor(Color.WHITE);
-                    canvas.drawBitmap(bitmap, 0, 0, null);
-                    Rect r = new Rect(0, 0, width, height);
-                    page.render(bitmap, r, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                    bitmaps.add(bitmap);
-                    // close the page
+
+                final int pageCount = renderer.getPageCount();//总数
+                if (pageCount > 0) {
+                    PdfRenderer.Page page = renderer.openPage(0);
+                    double scale = 1.6;
+                    int width = new Double(page.getWidth() * scale).intValue();
+                    int height = new Double(page.getHeight() * scale).intValue();
+
+                    Bitmap bitmap_total = Bitmap.createBitmap(width, height * pageCount, Bitmap.Config.ARGB_4444);
+                    Canvas canvas_total = new Canvas(bitmap_total);
+
                     page.close();
+                    for (int i = 0; i < pageCount; i++) {
+                        PdfRenderer.Page page_item = renderer.openPage(i);
+
+                        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
+                        //todo 以下三行处理图片存储到本地出现黑屏的问题，这个涉及到背景问题
+                        Canvas canvas = new Canvas(bitmap);
+                        canvas.drawColor(Color.WHITE);
+                        canvas.drawBitmap(bitmap, 0, 0, null);
+                        Rect r = new Rect(0, 0, width, height);
+                        page_item.render(bitmap, r, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+
+                        canvas_total.drawBitmap(bitmap, 0, i * height, null);
+                        bitmap.recycle();
+                        bitmap = null;
+                        page_item.close();
+                    }
+                    renderer.close();
+
+                    bitmaps.add(bitmap_total);
                 }
-                // close the renderer
-                renderer.close();
             }
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         return bitmaps;
-
     }
 
     public static String saveImageToGallery(Context context, ArrayList<Bitmap> bitmaps) {
