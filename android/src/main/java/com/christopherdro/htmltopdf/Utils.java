@@ -63,7 +63,7 @@ public class Utils {
                 final int pageCount = renderer.getPageCount();//总数
                 if (pageCount > 0) {
                     PdfRenderer.Page page = renderer.openPage(0);
-                    double scale = 1.6;
+                    double scale = 1;
                     int width = new Double(page.getWidth() * scale).intValue();
                     int height = new Double(page.getHeight() * scale).intValue();
 
