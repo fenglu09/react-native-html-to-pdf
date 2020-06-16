@@ -1,6 +1,6 @@
 {
   "name": "react-native-html-to-pdf",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "index.js",
   "description": "Convert html strings to PDF documents using React Native",
   "bugs": {
