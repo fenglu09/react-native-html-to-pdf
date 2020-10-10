@@ -52,7 +52,7 @@
     UIColor *_bgColor;
     NSInteger *_numberOfPages;
     CGSize _PDFSize;
-    UIWebView *_webView;
+    WKWebView *_webView;
     float _paddingBottom;
     float _paddingTop;
     float _paddingLeft;
@@ -73,8 +73,8 @@ RCT_EXPORT_MODULE();
 - (instancetype)init
 {
     if (self = [super init]) {
-        _webView = [[UIWebView alloc] initWithFrame:self.bounds];
-        _webView.delegate = self;
+        _webView = [[WKWebView alloc] initWithFrame:self.bounds];
+        _webView.navigationDelegate = self;
         [self addSubview:_webView];
         autoHeight = false;
     }
@@ -281,20 +281,21 @@ RCT_EXPORT_METHOD(convert:(NSDictionary *)options
     NSString *path = [[NSBundle mainBundle] bundlePath];
     NSURL *baseURL = [NSURL fileURLWithPath:path];
     
-    [_webView loadHTMLString:_html baseURL:baseURL];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_webView loadHTMLString:_html baseURL:baseURL];
+    });
     
     _resolveBlock = resolve;
     _rejectBlock = reject;
     
 }
 
-- (void)webViewDidFinishLoad:(UIWebView *)awebView
-{
-    if (awebView.isLoading)
-    return;
+-(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    if (webView.isLoading)
+        return;
     
     UIPrintPageRenderer *render = [[UIPrintPageRenderer alloc] init];
-    [render addPrintFormatter:awebView.viewPrintFormatter startingAtPageAtIndex:0];
+    [render addPrintFormatter:webView.viewPrintFormatter startingAtPageAtIndex:0];
     
     // Define the printableRect and paperRect
     // If the printableRect defines the printable area of the page
